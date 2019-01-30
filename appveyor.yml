@@ -6,6 +6,8 @@ stack: jdk 8
 # disable msbuild
 build: off
 
+init:
+  - sh: wget https://curl.haxx.se/ca/cacert.pem -O $HOME/cacert.pem
 test_script:
 - ./gradlew
 
@@ -18,7 +20,7 @@ after_test:
 
 on_finish:
   - sh: |
-      find "$APPVEYOR_BUILD_FOLDER" -type f -name 'TEST*.xml' -print0 | xargs -t -0 -I '{}' curl -v --retry 3 -F 'file=@{}' "https://ci.appveyor.com/api/testresults/junit/$APPVEYOR_JOB_ID"
+      find "$APPVEYOR_BUILD_FOLDER" -type f -name 'TEST*.xml' -print0 | xargs -t -0 -I '{}' curl --cacert $HOME/cacert.pem -v --retry 3 -F 'file=@{}' "https://ci.appveyor.com/api/testresults/junit/$APPVEYOR_JOB_ID"
   - ps: |
       if ($isWindows)
       {
