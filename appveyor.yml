@@ -22,7 +22,8 @@ on_finish:
   - sh: |
       RED='\033[0;31m'
       NC='\033[0m'
-      find "$APPVEYOR_BUILD_FOLDER" -type f -name 'TEST*.xml' -print0 | xargs -t -0 -I '{}' bash -c 'curl --cacert $HOME/cacert.pem -v --retry 3 -F "file=@{}" "https://ci.appveyor.com/api/testresults/junit/$APPVEYOR_JOB_ID" || echo -e "\033[0;31mERRORed curl! ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\033[0m"'
+      find "$APPVEYOR_BUILD_FOLDER" -type f -name 'TEST*.xml' -print0 | 
+      xargs -0 -I '{}' bash -c 'echo {}; curl --cacert $HOME/cacert.pem -v --retry 3 -F "file=@{}" "https://ci.appveyor.com/api/testresults/junit/$APPVEYOR_JOB_ID" &>curl.output || { echo -e "\033[0;31mERRORed curl!\033[0m"; cat curl.output }'
   - ps: |
       if ($isWindows)
       {
